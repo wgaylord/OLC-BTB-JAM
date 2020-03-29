@@ -135,8 +135,8 @@ class BrickWall(Tile):
 class Tree(Tile):
     def __init__(self):
         super().__init__()
-        self.texture.fill((0,60,0))
-        draw.rect(self.texture,(0,255,0),(0,12,14,14))
+        self.texture.fill((0,255,0))
+        draw.polygon(self.texture,(0,60,0),[(0,12),(7,0),(14,12)])
         draw.rect(self.texture,(200,100,50),(6,12,2,14))
         self.solid = False
         

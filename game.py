@@ -5,9 +5,11 @@ from pygame import Rect , draw
 from tiles import tiles,player
 import json
 
+full = True
 
 pygame.init()
 pygame.font.init()
+pygame.mouse.set_cursor(*pygame.cursors.diamond)
 
 def text_to_screen(screen, text, x, y, size = 50,color = (200, 000, 000)):
     try:
@@ -24,7 +26,7 @@ size = width, height = 640, 480
 
 screen_center = (width//2,height//2)
 
-screen = pygame.display.set_mode(size)
+screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
 
 screen_tile_width = width//16
 screen_tile_height = height//16
@@ -167,7 +169,14 @@ while 1:
         currentInventorySelected = len(inventory)-1
         if currentInventorySelected < 0:
             currentInventorySelected =0
-
+    if key == 292:
+        if full == False:
+            full = True
+            screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
+        else:
+            screen = pygame.display.set_mode(size)
+        key = 0
+   # print(key)
 
 
 

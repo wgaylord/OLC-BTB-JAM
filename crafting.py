@@ -34,16 +34,27 @@ def craftWood(inventory,current):
     return inventory,current,False
     
 def craftBrick(inventory,current):
-    if inventory[current][0] == "stone" and inventory[current][1] > 4:
+    if inventory[current][0] == "stone" and inventory[current][1] >= 4:
         remove_from_inventory(inventory,current)
         remove_from_inventory(inventory,current)
         remove_from_inventory(inventory,current)
         remove_from_inventory(inventory,current)
-        add_to_inventory(inventory,"brick_wall"
+        add_to_inventory(inventory,"brick_wall")    
         return inventory,current,True
     return inventory,current,False
-    
-InventoryCrafts = [craftWood,craftBrick]
+ 
+
+def craftCraftingTable(inventory,current):
+    if inventory[current][0] == "wood" and inventory[current][1] >= 4:
+        remove_from_inventory(inventory,current)
+        remove_from_inventory(inventory,current)
+        remove_from_inventory(inventory,current)
+        remove_from_inventory(inventory,current)
+        add_to_inventory(inventory,"crafting_table")    
+        return inventory,current,True
+    return inventory,current,False
+ 
+InventoryCrafts = [craftWood,craftBrick,craftCraftingTable]
 
 def attemptInvetoryCraft(inventory,current):
     for x in InventoryCrafts:
