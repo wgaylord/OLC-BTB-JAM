@@ -2,6 +2,10 @@ import sys, pygame
 import time
 import random
 from pygame import Rect , draw
+from tiles import tiles,player
+import json
+
+
 pygame.init()
 pygame.font.init()
 
@@ -34,7 +38,6 @@ world_height = world_height_px//16
 worldSurface = pygame.Surface((world_width_px,world_height_px))
 worldSurface.fill((0,255,0))
 
-#draw.circle(worldSurface,(255,0,0),(world_width//2,world_height//2),10)
 
 PlayerX = world_width//2
 PlayerY = world_height//2
@@ -45,61 +48,15 @@ world = []
 for x in range(world_width):
     world.append([])
     for y in range(world_height):
-        tile = 1
+        tile = "grass"
         if x < 16 or x > 279:
-            tile = 0
+            tile = "border"
         if y < 16 or y >224:
-            tile = 0
+            tile = "border"
         world[x].append(tile)
         
 
 
-border = pygame.Surface((16,16))
-border.fill((0,0,0))
-
-grass = pygame.Surface((16,16))
-grass.fill((101, 67, 33))
-draw.rect(grass,(0,255,0),(1,1,14,14))
-
-grass1 = pygame.Surface((16,16))
-grass1.fill((101, 67, 33))
-draw.rect(grass1,(0,245,0),(1,1,14,14))
-
-grass2 = pygame.Surface((16,16))
-grass2.fill((101, 67, 33))
-draw.rect(grass2,(0,220,0),(1,1,14,14))
-
-grass3 = pygame.Surface((16,16))
-grass3.fill((101, 67, 33))
-draw.rect(grass3,(0,200,5),(1,1,14,14))
-
-
-water = pygame.Surface((16,16))
-water.fill((0,0,255))
-
-door_closed = pygame.Surface((16,16))
-door_closed.fill((100,10,0))
-draw.rect(door_closed,(200,100,50),(3,3,12,12))
-
-door_open = pygame.Surface((16,16))
-door_open.fill((100,10,0))
-draw.rect(door_open,(200,100,50),(5,1,2,2))
-
-
-brick_wall = pygame.Surface((16,16))
-brick_wall.fill((100,10,0))
-
-trees = pygame.Surface((16,16))
-trees.fill((0,60,0))
-draw.rect(trees,(0,255,0),(0,12,14,14))
-draw.rect(trees,(200,100,50),(6,12,2,14))
-
-
-player = pygame.Surface((16,16))
-player.fill((0,255,0))
-draw.rect(player,(255,0,0),(3,3,11,11))
-
-tiles = [border,grass,grass1,grass2,grass3,water,door_closed,door_open,brick_wall,trees]
 
 #Texture world with random grass variants
 
@@ -107,81 +64,40 @@ tiles = [border,grass,grass1,grass2,grass3,water,door_closed,door_open,brick_wal
 inventory = []
 
 
-for x in range(10000):
-    world[random.randint(16,279)][random.randint(16,224)] = 2
-    world[random.randint(16,279)][random.randint(16,224)] = 3
-    world[random.randint(16,279)][random.randint(16,224)] = 4
+
+world[PlayerX-2][PlayerY-1] = "brick_wall"
+world[PlayerX-1][PlayerY-1] = "brick_wall"
+world[PlayerX][PlayerY-1] = "brick_wall"
+world[PlayerX+1][PlayerY-1] = "brick_wall"
+world[PlayerX+2][PlayerY-1] = "brick_wall"
+world[PlayerX+2][PlayerY] = "brick_wall"
+world[PlayerX+2][PlayerY+1] = "brick_wall"
+world[PlayerX+1][PlayerY+1] = "brick_wall"
+world[PlayerX][PlayerY+1] = "brick_wall"
+world[PlayerX-1][PlayerY+1] = "brick_wall"
+world[PlayerX-2][PlayerY+1] = "brick_wall"
+world[PlayerX-2][PlayerY] = "door_closed"
+
+world[PlayerX][PlayerY+5] = "crafting_table"
 
 
-world[PlayerX-2][PlayerY-1] = 8
-world[PlayerX-1][PlayerY-1] = 8
-world[PlayerX][PlayerY-1] = 8
-world[PlayerX+1][PlayerY-1] = 8
-world[PlayerX+2][PlayerY-1] = 8
-world[PlayerX+2][PlayerY] = 8
-world[PlayerX+2][PlayerY+1] = 8
-world[PlayerX+1][PlayerY+1] = 8
-world[PlayerX][PlayerY+1] = 8
-world[PlayerX-1][PlayerY+1] = 8
-world[PlayerX-2][PlayerY+1] = 8
-world[PlayerX-2][PlayerY] = 6
-
-
-for x in range(100):
-    world[random.randint(16,279)][random.randint(16,224)] = 9
-
-
-def doesCollide():
-    if world[PlayerX][PlayerY] in [0,5,6,8]:    
-        return True
-
-
-def add_to_inventory(tile):
-    index = 0
-    for x in inventory:
-        if x[0] == tile:
-            inventory[index][1] +=1
-            
-            return
-        else:
-            index+=1
-    inventory.append([tile,1])
-
-def remove_from_inventory(tile):
-    index = 0
-    while index < len(inventory):
-        if(inventory[currentInventorySelected][1]) == 1:
-            del inventory[currentInventorySelected]
-            return
-        else:
-            inventory[currentInventorySelected][1]-=1
-            return
-        index+=1
+for x in range(200):
+    world[random.randint(16,279)][random.randint(16,224)] = "tree"
     
+for x in range(100):
+    pocket_size = random.randint(2,10)
+    x = random.randint(16,279)
+    y = random.randint(16,224)
+    if abs(PlayerX - x) < (pocket_size+10) or abs(PlayerY - y) < (pocket_size+10):
+        continue
+    world[x][y] = "stone"
+    for z in range(pocket_size):
+        for a in range(pocket_size):
+            world[x+z][y+a] = "stone"
+
+
 
 currentInventorySelected = 0
-
-def do_tile_click(button,x,y):
-    if button == 1:
-        if world[x][y] == 6:
-            world[x][y] = 7
-            return
-        if world[x][y] == 7:
-            world[x][y] = 6
-            return
-        if world[x][y] in [1,2,3,4,5] and len(inventory) > 0:
-            world[x][y] = inventory[currentInventorySelected][0]
-            remove_from_inventory(inventory[currentInventorySelected][0])
-            
-    if button == 3:
-        if world[x][y] not in [0,1,2,3,4,5]:
-            tile = world[x][y]
-            if tile == 7:
-                tile = 6
-            if(len(inventory) > 32):
-                return
-            add_to_inventory(tile)
-            world[x][y] = random.randint(1,4)
 
 t = time.time()
 
@@ -195,6 +111,23 @@ while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
         if event.type == pygame.KEYDOWN:
+            if event.key==115 and event.mod==64:
+                file = open("save.json","w+")
+                data = {}
+                data["world"] = world
+                data["inventory"] = inventory
+                data["PlayerX"] = PlayerX
+                data["PlayerY"] = PlayerY
+                json.dump(data,file)
+                file.close()
+            if event.key==108 and event.mod==64:
+                file = open("save.json")
+                data = json.load(file)
+                world = data["world"]
+                inventory = data["inventory"]
+                PlayerX = data["PlayerX"]
+                PlayerY = data["PlayerY"]
+                file.close()
             key = event.key
         if event.type == pygame.KEYUP:
             if event.key == key:
@@ -203,25 +136,24 @@ while 1:
             if(event.pos[1] < height-32):
                 x = ((event.pos[0] - (width//2))//16)
                 y = ((event.pos[1] - (height//2))//16)
-                if abs(x) < 5 or abs(y) < 5:
-                    do_tile_click(event.button,PlayerX+x,PlayerY+y)
-
+                if abs(x) < 5 and abs(y) < 5:
+                    world,inventory,currentInventorySelected = tiles[world[PlayerX+x][PlayerY+y]].onClick(event.button,world,PlayerX+x,PlayerY+y,inventory,currentInventorySelected)
     if key == 119:
         PlayerY-=1
-        if doesCollide():
+        if tiles[world[PlayerX][PlayerY]].solid:
             PlayerY+=1
     if key == 115:
         PlayerY+=1
-        if doesCollide():
+        if tiles[world[PlayerX][PlayerY]].solid:
             PlayerY-=1
     
     if key == 97:
         PlayerX-=1
-        if doesCollide():
+        if tiles[world[PlayerX][PlayerY]].solid:
             PlayerX+=1
     if key == 100:
         PlayerX+=1
-        if doesCollide():
+        if tiles[world[PlayerX][PlayerY]].solid:
             PlayerX-=1
     if key == 113:
         if currentInventorySelected > 0:
@@ -245,7 +177,7 @@ while 1:
 
     for x in range(40):
         for y in range(30):
-            screen.blit(tiles[world[Left+x][Top+y]],(x*16,y*16))
+            screen.blit(tiles[world[Left+x][Top+y]].draw(world,PlayerX,PlayerY,Left+x,Top+y),(x*16,y*16))
     
     screen.blit(player,screen_center)
     
@@ -258,7 +190,7 @@ while 1:
     offset = 32
 
     for x in inventory:
-        screen.blit(tiles[x[0]],(offset,height-24))
+        screen.blit(tiles[x[0]].draw(world,PlayerX,PlayerY,0,0),(offset,height-24))
         text_to_screen(screen,str(x[1]),offset+14,height-14,10,(0,0,0))
         offset+=32
     
@@ -270,5 +202,5 @@ while 1:
         pygame.display.set_caption(str(count) + " FPS")
         count = 0
         t = time.time()
-    pygame.time.wait(40)
+    pygame.time.wait(35)
     pygame.display.flip()
