@@ -53,7 +53,7 @@ class Tile(object):
                 world[x][y] = "grass"
         return world,inventory,current
         
-class Boarder(Tile): 
+class Border(Tile): 
     def __init__(self):
         super().__init__()
         self.texture.fill((0,0,0))
@@ -173,5 +173,5 @@ player = Surface((16,16))
 player.fill((0,255,0))
 draw.rect(player,(255,0,0),(3,3,11,11))
 
-tiles = {"boarder":Boarder(),"grass":Grass(),"water":Water(),"door_open":DoorOpen(),"door_closed":DoorClosed(),"brick_wall":BrickWall(),"tree":Tree(),"stone":Stone(),"crafting_table":Crafting(),"wood":Wood()}
+tiles = {"border":Border(),"grass":Grass(),"water":Water(),"door_open":DoorOpen(),"door_closed":DoorClosed(),"brick_wall":BrickWall(),"tree":Tree(),"stone":Stone(),"crafting_table":Crafting(),"wood":Wood()}
 
